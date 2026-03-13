@@ -26,14 +26,11 @@
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
-                    <!-- Данные будут вставлены через JavaScript -->
+                    <tr>
+                        <td colspan="3" class="loading">Загрузка...</td>
+                    </tr>
                 </tbody>
             </table>
-
-            <div id="loading" class="loading">Загрузка...</div>
-            <div id="error" class="error" style="display:none;">
-                ❌ Не удалось загрузить таблицу рейтинга
-            </div>
         </main>
 
         <footer>
@@ -42,21 +39,20 @@
     </div>
 
     <script>
-        const API_URL = 'https://api.github.com/repos/MoJIoToK/eva360-leaderboard/contents/index.html';
-
         async function loadLeaderboard() {
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch('data.json');
                 const data = await response.json();
-                
-                const content = atob(data.content);
-                const leaderboard = JSON.parse(content);
-
-                renderLeaderboard(leaderboard);
+                renderLeaderboard(data);
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
+                document.getElementById('leaderboard-body').innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 40px; color: #dc3545;">
+                            ❌ Не удалось загрузить таблицу рейтинга
+                        </td>
+                    </tr>
+                `;
             }
         }
 
@@ -65,35 +61,39 @@
             tbody.innerHTML = '';
 
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3">Рейтинг пока пуст</td></tr>';
-                document.getElementById('loading').style.display = 'none';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 40px;">
+                            Рейтинг пока пуст
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
             data.forEach((item, index) => {
                 const row = document.createElement('tr');
                 
-                // Медали для топ-3
                 let medal = '';
                 if (index === 0) medal = '🥇';
                 else if (index === 1) medal = '🥈';
                 else if (index === 2) medal = '🥉';
 
+                const username = item.username ? `@${item.username}` : `user${item.user_id}`;
+                
                 row.innerHTML = `
-                    <td>${medal} ${index + 1}</td>
-                    <td>${item.username || 'user' + item.user_id}</td>
+                    <td><span class="medal">${medal}</span>${index + 1}</td>
+                    <td>${username}</td>
                     <td class="rating">${item.rating}</td>
                 `;
                 tbody.appendChild(row);
             });
 
-            // Обновляем время
             document.getElementById('update-time').textContent = new Date().toLocaleString('ru-RU');
-            document.getElementById('loading').style.display = 'none';
         }
 
-        // Загружаем данные при старте
         loadLeaderboard();
+        setInterval(loadLeaderboard, 30000);
     </script>
 </body>
 </html>
