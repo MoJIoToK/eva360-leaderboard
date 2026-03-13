@@ -42,15 +42,13 @@
     </div>
 
     <script>
-        // URL для получения данных (замените на ваш)
-        const API_URL = 'https://api.github.com/repos/MoJIoToK/eva360-leaderboard/contents/data.json';
+        const API_URL = 'https://api.github.com/repos/MoJIoToK/eva360-leaderboard/contents/index.html';
 
         async function loadLeaderboard() {
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                // Декодируем содержимое из Base64
                 const content = atob(data.content);
                 const leaderboard = JSON.parse(content);
 
