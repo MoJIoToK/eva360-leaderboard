@@ -1,10 +1,14 @@
 [
   {
     "username": "MrDukaliss",
-    "rating": 6
+    "rating": 7
   },
   {
     "username": "Regent63",
+    "rating": 1
+  },
+  {
+    "username": null,
     "rating": 1
   }
 ]
